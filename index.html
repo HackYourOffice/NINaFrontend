@@ -45,13 +45,44 @@
         img {
             width: 400;
         }
+
+        #persons {
+            position: fixed;
+            top: 330px;
+            left: 20px;
+        }
+
+        li[visible=true] {
+            background-color: green;
+        }
+
+        li {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
 
 <body>
+    <ul id="persons">
+    </ul>
     <div class="container1">
         <div class="canvas1">
             <script language=Javascript>
+                function toggleVisible(event) {
+                    let target = event.target;
+                    if (target.getAttribute("visible")) {
+                        target.removeAttribute("visible");
+                    }
+                    else {
+                        target.setAttribute("visible", true);
+                    }
+                }
+
                 var bg;
                 var y = 0;
                 function setup() {
@@ -66,12 +97,18 @@
                     var oReq = new XMLHttpRequest();
                     oReq.addEventListener("load", function () {
                         jsonData = JSON.parse(this.responseText);
-                        console.log(jsonData);
                         for (let position of jsonData) {
-                            console.log(position);
                             position.beacon.x = position.beacon.x + Math.floor((Math.random() - 0.5) * 15);
                             position.beacon.y = position.beacon.y + Math.floor((Math.random() - 0.5) * 15);
-                            console.log(position.beacon.x);
+
+                            if (document.getElementById(position.name) == null) {
+                                let li = document.createElement("li");
+                                li.setAttribute("id", position.name);
+                                li.appendChild(document.createTextNode(position.name));
+                                li.setAttribute("visible", true);
+                                li.onclick = toggleVisible;
+                                document.getElementById("persons").appendChild(li);
+                            }
                         }
                     });
                     oReq.open("GET", "http://10.0.20.87:8080/findPersons");
@@ -88,30 +125,32 @@
 
                 // Draw Persons
                 function drawPerson(x, y, name, description, timestamp, color) {
-                    if (!color) {
-                        // R,G,B,Transparenz 
-                        fill(65, 105, 225, 255);
-                    }
-                    else {
-                        fill(color);
-                    }
-                    // Rahmen des Kreises
-                    // noStroke();
-                    stroke(127, 63, 120);
-                    // Durchmesser d
-                    d = 12;
-                    ellipse(x, y, d, d);
-                    if (mouseX >= (x - d) && mouseX <= (x + d) && mouseY >= (y - d) && mouseY <= (y + d)) {
-                        fill('rgba(0, 0, 0, 0.4)');
-                        // rect(150, 50, 140, 50);
-                        rect(x, y - 50, 200, 50);
-                        fill(255);
-                        text(name, x + 10, y - 35);
-                        text("Raum: " + description, x + 10, y - 20);
+                    if (document.getElementById(name).getAttribute("visible")) {
+                        if (!color) {
+                            // R,G,B,Transparenz 
+                            fill(65, 105, 225, 255);
+                        }
+                        else {
+                            fill(color);
+                        }
+                        // Rahmen des Kreises
+                        // noStroke();
+                        stroke(127, 63, 120);
+                        // Durchmesser d
+                        d = 12;
+                        ellipse(x, y, d, d);
+                        if (mouseX >= (x - d) && mouseX <= (x + d) && mouseY >= (y - d) && mouseY <= (y + d)) {
+                            fill('rgba(0, 0, 0, 0.4)');
+                            // rect(150, 50, 140, 50);
+                            rect(x, y - 50, 200, 50);
+                            fill(255);
+                            text(name, x + 10, y - 35);
+                            text("Raum: " + description, x + 10, y - 20);
 
-                        timestamp = timestamp.substr(8, 2) + "." + timestamp.substr(5, 2) + "." + timestamp.substr(0, 4) + " " + timestamp.substr(11, 8) + " Uhr";
+                            timestamp = timestamp.substr(8, 2) + "." + timestamp.substr(5, 2) + "." + timestamp.substr(0, 4) + " " + timestamp.substr(11, 8) + " Uhr";
 
-                        text(timestamp, x + 10, y - 5);
+                            text(timestamp, x + 10, y - 5);
+                        }
                     };
                 }
             </script>
