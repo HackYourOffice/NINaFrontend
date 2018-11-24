@@ -1,0 +1,131 @@
+<html>
+<head>
+ <title>Where is Nina?</title>
+ <script src="js/p5.js"></script>
+ <style type="text/css" media="screen">
+ body        { text-align:left; font-size:90%;font-family:Verdana, Geneva, Arial, Helvetica, sans-serif; margin:0em 0em; }
+ canvas      { border: 0px solid black; }
+ .container1 { position: relative; }
+ .canvas1    { position: relative; } 
+ .info       { width: 500px; position: relative; float:left; }
+ .bild       { top: 25px; position: relative; }
+ .text       { top: 25px; position: relative; font-size: 14px; font-face: Arial; left: 20px; }
+ img         { width: 400; }
+</style>
+</head>
+<body>
+<div class="container1">
+<div class="canvas1">
+<script language=Javascript>
+ var bg;
+ var y=0;  
+ function setup() {
+  bg = loadImage("pics/raumplan2.png");
+  createCanvas(600, 685);
+  // R,G,B,Transparenz  
+ }
+ function draw() { 
+  background(bg);
+  // Testdaten
+  // ---------------------------  
+  // Empfang      258   432
+  // Nullpointer  282   482
+  // H20          304   520
+  // 10 vorne     374   604
+  // Kaffee       325   558
+  // Küche        402   551
+  // Herren WC    402   505
+  // Wohnzimmer   402   469
+  // Kreativraum  402   437
+  // Memoryleak   402   396
+  // Holodeck     402   342
+  // Biliadecke   402   290
+  // Damen WC     334   203
+  // Säule        348   502
+  // Büro         169   328
+
+  //  var jsonData = [
+  //  {
+  //    "beacon": {
+  //      "description": "Damen WC",
+  //      "id": 0,
+  //      "x": 402,
+  //      "y": 290,
+  //      "z": 0
+  //    },
+  //    "name": "Peter",
+  //   "timestamp": "2018-11-23T22:47:53.124Z"
+  //	}
+  //];
+
+  // console.log(jsonData);
+  var jsonData = [];
+  request = new XMLHttpRequest();
+  request.open("GET", "http://10.0.20.50/nina/findPersons");
+  request.onload = function () 
+  {
+   jsonData = JSON.parse(request.response);
+  }
+  request.send();
+
+  for (let b of jsonData)
+  {
+   drawPerson(parseInt(b.beacon.x),parseInt(b.beacon.y),b.name, b.beacon.description, b.timestamp ,"blue");       
+  }
+ }
+
+ // Sleep Function
+ function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+   }
+  }
+ }
+
+ // Draw Persons
+ function drawPerson(x,y,name, description, timestamp, color)
+ {
+  // R,G,B,Transparenz 
+  if (color=="green")  
+  {
+   fill(173,255,47,255);
+  }
+  if (color=="blue")  
+  {
+   fill(65,105,225,255);
+  }
+  if (color=="orange")  
+  {
+   fill(255,140,0,255);
+  }
+  // Rahmen
+  // noStroke();
+  // Durchmesser d
+  d = 12;
+  stroke(127, 63, 120);
+  ellipse(x, y, d, d); 
+	if (mouseX >= (x-d) && mouseX <= (x+d) && mouseY >=(y-d) && mouseY <= (y+d)) {
+      fill('rgba(0, 0, 0, 0.4)');
+      // rect(150, 50, 140, 50);
+      rect(x, y-50, 140, 50);
+      fill(255);
+      text(name, x+10, y-35);
+      text(description, x+10, y-20);
+      text(timestamp, x+10, y-5);
+    };
+  }
+</script>
+</div>
+<div class="info"> 
+ <div class="bild">
+  <img src=pics/where_is_nina_bw.png width=400 align=top>
+ </div>
+ <div class="text">
+  Made by Daniel, Helge, Marco, Sebastian, Simon
+ </div>  
+</div>
+
+</body>
+</html>
