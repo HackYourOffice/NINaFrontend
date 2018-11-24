@@ -1,95 +1,130 @@
 <html>
+
 <head>
- <title>Where is Nina?</title>
- <script src="js/p5.js"></script>
- <style type="text/css" media="screen">
-  body        { text-align:left; font-size:90%;font-family:Verdana, Geneva, Arial, Helvetica, sans-serif; margin:0em 0em; }
-  canvas      { border: 0px solid black; }
-  .container1 { position: relative; }
-  .canvas1    { position: relative; } 
-  .info       { width: 500px; position: relative; float:left; }
-  .bild       { top: 25px; position: relative; }
-  .text       { top: 25px; position: relative; font-size: 14px; font-face: Arial; left: 20px; }
-  img         { width: 400; }
-</style>
+    <title>Where is Nina?</title>
+    <script src="js/p5.js"></script>
+    <style type="text/css" media="screen">
+        body {
+            text-align: left;
+            font-size: 90%;
+            font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+            margin: 0em 0em;
+        }
+
+        canvas {
+            border: 0px solid black;
+        }
+
+        .container1 {
+            position: relative;
+        }
+
+        .canvas1 {
+            position: relative;
+        }
+
+        .info {
+            width: 500px;
+            position: relative;
+            float: left;
+        }
+
+        .bild {
+            top: 25px;
+            position: relative;
+        }
+
+        .text {
+            top: 25px;
+            position: relative;
+            font-size: 14px;
+            font-face: Arial;
+            left: 20px;
+        }
+
+        img {
+            width: 400;
+        }
+    </style>
 </head>
+
 <body>
-<div class="container1">
-<div class="canvas1">
-<script language=Javascript>
- var bg;
- var y=0;  
- function setup() {
-  bg = loadImage("pics/raumplan2.png");
-  createCanvas(600, 685);
- }
+    <div class="container1">
+        <div class="canvas1">
+            <script language=Javascript>
+                var bg;
+                var y = 0;
+                function setup() {
+                    bg = loadImage("pics/raumplan2.png");
+                    createCanvas(600, 685);
+                }
 
 
- var jsonData = [];
- 
- function updatePositionData() {
-		var oReq = new XMLHttpRequest();
-		oReq.addEventListener("load", function () {
-			jsonData = JSON.parse(this.responseText);
-			console.log(this.responseText);
-			console.log(jsonData);
-		});
-		oReq.open("GET", "http://10.0.20.87:8080/findPersons");
-		////  oReq.open("GET", "http://10.0.20.50:8080/findPersons");
-		
-		oReq.send();
-		setTimeout(updatePositionData, 1000);
-	}
- updatePositionData();
- function draw() {   
-   background(bg);
-	for (position of jsonData)
-	{
-		drawPerson(parseInt(position.beacon.x),parseInt(position.beacon.y),position.name, position.beacon.description, position.timestamp, position.color);       
-	}
- }
+                var jsonData = [];
 
- // Draw Persons
- function drawPerson(x,y,name, description, timestamp, color)
- {
-  if (!color)  
-  {
-   // R,G,B,Transparenz 
-   fill(65,105,225,255);
-  }
-  else
-  {
-   fill(color);
-  }
-  // Rahmen des Kreises
-  // noStroke();
-  stroke(127, 63, 120);
-  // Durchmesser d
-  d = 12;
-  ellipse(x, y, d, d); 
-	if (mouseX >= (x-d) && mouseX <= (x+d) && mouseY >=(y-d) && mouseY <= (y+d)) {
-      fill('rgba(0, 0, 0, 0.4)');
-      // rect(150, 50, 140, 50);
-      rect(x, y-50, 200, 50);
-      fill(255);
-      text(name, x+10, y-35);
-      text("Raum: " + description, x+10, y-20);
-	  
-	  timestamp = timestamp.substr(8,2) + "." + timestamp.substr(5,2) + "." + timestamp.substr(0,4) + " " + timestamp.substr(11,8) + " Uhr";
-	  	  
-      text( timestamp, x+10, y-5);
-    };
-  }
-</script>
-</div>
-<div class="info"> 
- <div class="bild">
-  <img src="pics/where_is_nina_bw.png" width=400 align=top>
- </div>
- <div class="text">
-  Made by Daniel, Helge, Marco, Sebastian, Simon
- </div>  
-</div>
+                function updatePositionData() {
+                    var oReq = new XMLHttpRequest();
+                    oReq.addEventListener("load", function () {
+                        jsonData = JSON.parse(this.responseText);
+                        console.log(jsonData);
+                        for (let position of jsonData) {
+                            console.log(position);
+                            position.beacon.x = position.beacon.x + Math.floor((Math.random() - 0.5) * 15);
+                            position.beacon.y = position.beacon.y + Math.floor((Math.random() - 0.5) * 15);
+                            console.log(position.beacon.x);
+                        }
+                    });
+                    oReq.open("GET", "http://10.0.20.87:8080/findPersons");
+                    oReq.send();
+                    setTimeout(updatePositionData, 1000);
+                }
+                updatePositionData();
+                function draw() {
+                    background(bg);
+                    for (position of jsonData) {
+                        drawPerson(parseInt(position.beacon.x), parseInt(position.beacon.y), position.name, position.beacon.description, position.timestamp, position.color);
+                    }
+                }
+
+                // Draw Persons
+                function drawPerson(x, y, name, description, timestamp, color) {
+                    if (!color) {
+                        // R,G,B,Transparenz 
+                        fill(65, 105, 225, 255);
+                    }
+                    else {
+                        fill(color);
+                    }
+                    // Rahmen des Kreises
+                    // noStroke();
+                    stroke(127, 63, 120);
+                    // Durchmesser d
+                    d = 12;
+                    ellipse(x, y, d, d);
+                    if (mouseX >= (x - d) && mouseX <= (x + d) && mouseY >= (y - d) && mouseY <= (y + d)) {
+                        fill('rgba(0, 0, 0, 0.4)');
+                        // rect(150, 50, 140, 50);
+                        rect(x, y - 50, 200, 50);
+                        fill(255);
+                        text(name, x + 10, y - 35);
+                        text("Raum: " + description, x + 10, y - 20);
+
+                        timestamp = timestamp.substr(8, 2) + "." + timestamp.substr(5, 2) + "." + timestamp.substr(0, 4) + " " + timestamp.substr(11, 8) + " Uhr";
+
+                        text(timestamp, x + 10, y - 5);
+                    };
+                }
+            </script>
+        </div>
+        <div class="info">
+            <div class="bild">
+                <img src="pics/where_is_nina_bw.png" width=400 align=top>
+            </div>
+            <div class="text">
+                Made by Daniel, Helge, Marco, Sebastian, Simon
+            </div>
+        </div>
 
 </body>
+
 </html>
